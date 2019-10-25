@@ -1,0 +1,3 @@
+# PolygonMinkowskiSum
+
+*Documentation goes here.*

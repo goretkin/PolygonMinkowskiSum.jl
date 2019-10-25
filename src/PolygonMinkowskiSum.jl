@@ -1,0 +1,3 @@
+module PolygonMinkowskiSum
+
+end # module
