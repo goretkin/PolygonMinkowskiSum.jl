@@ -4,11 +4,15 @@ export minkowski_sum
 using GeometryTypes: Point
 using LinearAlgebra: normalize, dot
 
+"""
+Polygon with no holes
+"""
 struct SimplePolygon{VP}
     points::VP
 end
 
-using RecipesBase: @recipe
+# @recipe macro requires RecipesBase to be defined in scope of macro use
+using RecipesBase: RecipesBase, @recipe
 
 @recipe function f(p::SimplePolygon)
     cycle = p.points[[1:end...,1]]
@@ -18,7 +22,7 @@ using RecipesBase: @recipe
 end
 
 # TODO doesn't work for `Array`. What is a generic constructor?
-rot_quarter(v::P) where {P} = P(-v[1], v[0]) # TODO constrain P
+rot_quarter(v::P) where {P} = P(-v[2], v[1]) # TODO constrain P
 
 # asin(angle from v1 to v2) * |v1| * |v2|
 cross(v1, v2) = v1[1] * v2[2] - v1[2] * v2[1]
@@ -55,19 +59,18 @@ function minkowski_sum(this::SimplePolygon, alongthis::SimplePolygon)
     result = P[]
     n = 1
 
-    d = normalize(alongthis.points[n + 1] - alongthis.points[n])
+    d = alongthis.points[n + 1] - alongthis.points[n]
     # TODO don't create an array for these differences.
-    this_diff = [normalize(this.points[mod1(n + 1, end)] - this.points[n]) for n=1:length(this.points)]
-    #@show collect(cross(this_diff[i], this_diff[mod1(i + 1, end)])>0 for i = 1:length(this_diff))
+    this_diff = [this.points[mod1(n + 1, end)] - this.points[n] for n=1:length(this.points)]
     @assert all(cross(this_diff[i], this_diff[mod1(i + 1, end)])>0 for i = 1:length(this_diff))
-    @show this_diff
-
+    dots = [dot(d, d1) for d1 in this_diff]
+    flips = [dots[mod1(i+1, end)] * dots[i] for i in 1:length(dots)]
+    m = findfirst(x->(x<=zero(x)), flips) # generic zero (if units)
+    @show dots
+    @show flips
     @show d
-    m = mod1(arg_next_direction(this_diff, d) + 1, length(this_diff))
-    #@show this_diff[m]
-    #m = argmax(map(p->dot(p, d), this.points))
     push!(result, this.points[m] + alongthis.points[n])
-    #n += 1
+
     while length(result) < length(this.points) + length(alongthis.points)
         @show length(result)
         @show n, m
