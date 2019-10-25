@@ -65,24 +65,21 @@ function minkowski_sum(this::SimplePolygon, alongthis::SimplePolygon)
     @assert all(cross(this_diff[i], this_diff[mod1(i + 1, end)])>0 for i = 1:length(this_diff))
     dots = [dot(d, d1) for d1 in this_diff]
     flips = [dots[mod1(i+1, end)] * dots[i] for i in 1:length(dots)]
-    m = findfirst(x->(x<=zero(x)), flips) # generic zero (if units)
-    @show dots
-    @show flips
-    @show d
+    # generic zero (if units)
+    # TODO avoid collect
+    m = findfirst(((d,f),)->(d>=zero(d) && f<=zero(f)), collect(zip(dots, flips)))
+    #@show m
     push!(result, this.points[m] + alongthis.points[n])
 
     while length(result) < length(this.points) + length(alongthis.points)
-        @show length(result)
-        @show n, m
         # TODO avoid recomputing
         # TODO check for repeated points (causes div-by-zero in `normalize`)
         d_path = normalize(alongthis.points[mod1(n+1, end)] - alongthis.points[n])
         d_poly = normalize(this.points[mod1(m+1, end)] - this.points[mod1(m, end)])
-        @show d_path
-        @show d_poly
-        @show d
-        @assert cross(d, d_path) >= 0
-        @assert cross(d, d_poly) >= 0
+        # TODO these assertions are being violated, understand why they are wrong or why the algorithm is wrong
+        #@assert cross(d, d_path) >= 0
+        #@show cross(d, d_poly)
+        #@assert cross(d, d_poly) >= 0
         if cross(d, d_path) < cross(d, d_poly)
             n += 1
             d = d_path

@@ -21,7 +21,7 @@ big_square = minkowski_sum(square, square)
 plot(big_square, markershape=:cross)
 
 
-for offset = 0°:5°:360°
+for offset = 0°:45°:360°
     @show offset
     diamond = make_regular_ngon(4; offset=0°)
     square = make_regular_ngon(4; offset=offset#=+45°=#, radius=0.5)
