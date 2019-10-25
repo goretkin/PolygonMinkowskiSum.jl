@@ -4,12 +4,17 @@ authors = ["Gustavo Goretkin <gustavo.goretkin@gmail.com>"]
 version = "0.1.1"
 
 [deps]
-
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test"]
+GeometryTypes = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
 julia = "^1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UnitfulAngles = "6fb2a4bd-7999-5318-a3b2-8ad61056cd98"
+
+[targets]
+test = ["Test", "UnitfulAngles"]
