@@ -131,18 +131,14 @@ function find_minkowski_sum(this::SimplePolygon, alongthis::SimplePolygon)
     d = alongthis.points[n + 1] - alongthis.points[n]
     # TODO don't create an array for these differences.
     this_diff = diff(this)
-    @assert all(cross(this_diff[i], this_diff[mod1(i + 1, end)])>0 for i = 1:length(this_diff))
 
-    dots = [dot(d, d1) for d1 in this_diff]
-    flips = [dots[mod1(i+1, end)] * dots[i] for i in 1:length(dots)]
-    # generic zero (if units)
-    # TODO avoid collect
-    m = findfirst(((d,f),)->(d>=zero(d) && f<=zero(f)), collect(zip(dots, flips)))
-    #@show m
+    # find two edges in `this` that straddle `d`
+    is_ccws = [is_ccw(this_diff[mod1(i, end)], d, this_diff[mod1(i+1, end)]) for i = 1:length(this_diff)]
+    # index of `this` vertex that is incident to both edges
+    m = mod1(findfirst(is_ccws) + 1, length(is_ccws))
     push!(result, (m, n))
 
     while length(result) < length(this.points) + length(alongthis.points)
-        @show n, m
         # TODO avoid recomputing
         # TODO check for repeated points (causes div-by-zero in `normalize`)
         d_path = normalize(alongthis.points[mod1(n+1, end)] - alongthis.points[n])

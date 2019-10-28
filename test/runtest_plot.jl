@@ -34,3 +34,8 @@ for offset = 0°:45°:360°
     plot!(p, octogon, fillalpha=0.2)
     display(p)
 end
+
+Plots.pyplot() # gr doesn't yet support `reuse=false`: https://github.com/JuliaPlots/Plots.jl/issues/1370
+ps = DefaultDict(key->plot(reuse=false, title=key, aspect_ratio=1), passkey=true)
+minkowski_sum(sweepme, alongme, (ns=Plots, plots=ps))
+map(display, values(ps))
